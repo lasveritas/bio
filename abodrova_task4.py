@@ -6,7 +6,11 @@ second_line = []
 matrix = [] #матрица с весами
 route = {} #словарь типа: номер клетки-номер исходной клетки
 gap = 0.49
-change = 1
+
+weight_matrix = {('A', 'A'):7, ('A', 'R'):-2, ('A', 'N'):-1, ('A', 'K'):-1,
+                               ('R', 'R'):7,  ('R', 'N'):-1, ('R', 'K'):3,
+                                              ('N', 'N'):7,  ('N', 'K'):0,
+                                                             ('K', 'K'):6}
 
 #для определённости первая строка будет меньшей из данных
 if len(sys.argv[1]) >= len(sys.argv[2]):
@@ -35,10 +39,10 @@ for j in range(1, colomns):
     
 #выбираем максимальное значение     
 def environment(i, j):
-  if first_line[i] == second_line[j]:
-    diag = matrix[i-1][j-1] + 1
+  if (first_line[i], second_line[j]) in weight_matrix:
+    diag = matrix[i-1][j-1] + weight_matrix[(first_line[i], second_line[j])]
   else:
-    diag = matrix[i-1][j-1] - change
+    diag = matrix[i-1][j-1] + weight_matrix[(second_line[j], first_line[i])]
   up = matrix[i-1][j] - gap
   left = matrix[i][j-1] - gap
   
