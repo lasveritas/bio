@@ -5,12 +5,9 @@ first_line = []
 second_line = []
 matrix = [] #матрица с весами
 route = {} #словарь типа: номер клетки-номер исходной клетки
-gap = 0.49
-
-weight_matrix = {('A', 'A'):7, ('A', 'R'):-2, ('A', 'N'):-1, ('A', 'K'):-1,
-                               ('R', 'R'):7,  ('R', 'N'):-1, ('R', 'K'):3,
-                                              ('N', 'N'):7,  ('N', 'K'):0,
-                                                             ('K', 'K'):6}
+gap = 2
+change = 2
+match = 1
 
 #для определённости первая строка будет меньшей из данных
 if len(sys.argv[1]) >= len(sys.argv[2]):
@@ -28,67 +25,108 @@ colomns = len(second_line)
 for i in range(rows):
     matrix.append([0] * colomns)
     
-#заполняем первый ряд и первый столбец    
-for i in range(1, rows):
-  matrix[i][0] = matrix[i-1][0] - gap
-  route[(i, 0)] = (i-1, 0)
-      
-for j in range(1, colomns):
-  matrix[0][j] = matrix[0][j-1] - gap
-  route[(0, j)] = (0, j-1) 
-    
+ 
 #выбираем максимальное значение     
 def environment(i, j):
-  if (first_line[i], second_line[j]) in weight_matrix:
-    diag = matrix[i-1][j-1] + weight_matrix[(first_line[i], second_line[j])]
+  if first_line[i] == second_line[j]:
+    diag = matrix[i-1][j-1] + match
   else:
-    diag = matrix[i-1][j-1] + weight_matrix[(second_line[j], first_line[i])]
+    diag = matrix[i-1][j-1] - change
   up = matrix[i-1][j] - gap
   left = matrix[i][j-1] - gap
   
-  mx = max(diag, up, left)
-  
+  mx = max(diag, up, left, 0)
+ 
+  if mx == 0:
+    return ((-1, -1), 0)  
   if mx == diag:
     return ((i-1, j-1), diag)
   if mx == up:
     return ((i-1, j), up)
   if mx == left:
     return ((i, j-1), left)
+
   
-    
+end = (0, 0)
+end_weight = 0    
+  
 for el in range(1, rows):
   for i in range(el, rows):
     matrix[i][el] = environment(i, el)[1]
-    route[(i, el)] = environment(i, el)[0]
+    if matrix[i][el] > end_weight:
+      end_weight = matrix[i][el]
+      end = (i, el)
+    route[(i, el)] = environment(i, el)[0]  
   for j in range(el+1, colomns):
     matrix[el][j] = environment(el, j)[1]
+    if matrix[el][j] > end_weight:
+      end_weight = matrix[el][j]
+      end = (el, j)    
     route[(el, j)] = environment(el, j)[0]
    
-   
-al = [(rows-1, colomns-1)] 
-n = route[(rows-1, colomns-1)]
+al = [end] 
+n = route[end]
 al.append(n)
 
-while n != (0, 0):
+while matrix[n[0]][n[1]] !=0:
   n = route[n]
   al.append(n)
-
+  
+    
 f_line = ""
 s_line = ""
+
+
+#выравнивание строк
+if(n[0]==n[1]):
+  for i in range(1, n[0]+1):
+    f_line += first_line[i].lower()
+    s_line += second_line[i].lower()
   
-#выравнивание строк  
+if (n[0] > n[1]):
+  diff = n[0]-n[1]
+  for i in range(1, n[0]+1):
+    f_line += first_line[i].lower()
+  s_line += " " * diff
+  for i in range(1, n[1]+1):
+    s_line += second_line[i].lower()
+
+if (n[1]>n[0]):  
+  diff = n[1]-n[0]
+  for i in range(1, n[1]+1):
+    s_line += second_line[i].lower()
+  f_line += " " * diff
+  for i in range(1, n[0]+1):
+    f_line += first_line[i].lower()  
+
+ 
+f_ln = ""
+s_ln = ""
+
 for i in range(1, len(al)):
   if al[i][0] == al[i-1][0]:
-    f_line += "-"
-    s_line += second_line[al[i-1][1]]
+    f_ln += "-"
+    s_ln += second_line[al[i-1][1]].upper()
   elif al[i][1] == al[i-1][1]:  
-    f_line += first_line[al[i-1][0]]
-    s_line += "-"
+    f_ln += first_line[al[i-1][0]].upper()
+    s_ln += "-"
   else:
-    f_line += first_line[al[i-1][0]]
-    s_line += second_line[al[i-1][1]]
+    f_ln += first_line[al[i-1][0]].upper()
+    s_ln += second_line[al[i-1][1]].upper()
     
-print(f_line[::-1])
-print(s_line[::-1])
+f_line += f_ln[::-1]
+s_line += s_ln[::-1]
 
-print ('\n'+"alignment weight: "+ str(matrix[rows-1][colomns-1]))
+for i in range(end[0]+1, rows):
+  f_line += first_line[i]
+for i in range(end[1]+1, colomns):
+  s_line += second_line[i] 
+    
+   
+print(f_line)
+print(s_line)
+
+print ('\n'+"the best local alignmant: ")
+print(f_ln[::-1])
+print(s_ln[::-1])
+print ('\n'+"alignment weight: "+ str(matrix[end[0]][end[1]]))
