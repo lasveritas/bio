@@ -5,8 +5,10 @@ first_line = []
 second_line = []
 matrix = [] #матрица с весами
 route = {} #словарь типа: номер клетки-номер исходной клетки
-gap = 0.49
-change = 1
+gap_start = 15
+gap = 7
+change = 20
+match = 10
 
 #для определённости первая строка будет меньшей из данных
 if len(sys.argv[1]) >= len(sys.argv[2]):
@@ -23,42 +25,63 @@ colomns = len(second_line)
 #инициализация матрицы нулями
 for i in range(rows):
     matrix.append([0] * colomns)
+
+direction = {}
+direction[(0, 0)] = "diag"
     
 #заполняем первый ряд и первый столбец    
 for i in range(1, rows):
   matrix[i][0] = matrix[i-1][0] - gap
   route[(i, 0)] = (i-1, 0)
-      
+  direction[(i, 0)] = "up"
+  
 for j in range(1, colomns):
   matrix[0][j] = matrix[0][j-1] - gap
-  route[(0, j)] = (0, j-1) 
-    
+  route[(0, j)] = (0, j-1)
+  direction[(0, j)] = "left"
+
+  
+  
 #выбираем максимальное значение     
 def environment(i, j):
-  if first_line[i] == second_line[j]:
-    diag = matrix[i-1][j-1] + 1
+  
+  pdu = direction[(i-1, j)]
+  pdd = direction[(i-1, j-1)]
+  pdl = direction[(i, j-1)]
+  if pdu == "up":
+    up = matrix[i-1][j] - gap     
+  else: 
+    up = matrix[i-1][j] - gap_start - gap
+  if pdl == "left":
+    left = matrix[i][j-1] - gap 
   else:
-    diag = matrix[i-1][j-1] - change
-  up = matrix[i-1][j] - gap
-  left = matrix[i][j-1] - gap
+    left = matrix[i][j-1] - gap_start - gap 
+   
+  if first_line[i] == second_line[j]:
+    diag = matrix[i-1][j-1] + match
+  else:
+    diag = matrix[i-1][j-1] - change    
   
   mx = max(diag, up, left)
   
   if mx == diag:
-    return ((i-1, j-1), diag)
+    return ((i-1, j-1), diag, "diag")
   if mx == up:
-    return ((i-1, j), up)
+    return ((i-1, j), up, "up")
   if mx == left:
-    return ((i, j-1), left)
-  
-    
+    return ((i, j-1), left, "left")  
+   
 for el in range(1, rows):
   for i in range(el, rows):
-    matrix[i][el] = environment(i, el)[1]
-    route[(i, el)] = environment(i, el)[0]
+    env = environment(i, el)
+    matrix[i][el] = env[1]
+    route[(i, el)] = env[0]
+    direction[(i, el)] = env[2]
   for j in range(el+1, colomns):
-    matrix[el][j] = environment(el, j)[1]
-    route[(el, j)] = environment(el, j)[0]
+    env = environment(el, j)
+    matrix[el][j] = env[1]
+    route[(el, j)] = env[0]
+    direction[(el, j)] = env[2]
    
    
 al = [(rows-1, colomns-1)] 
