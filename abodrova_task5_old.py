@@ -5,12 +5,10 @@ first_line = []
 second_line = []
 matrix = [] #матрица с весами
 route = {} #словарь типа: номер клетки-номер исходной клетки
-gap = 0.49
-
-weight_matrix = {('A', 'A'):7, ('A', 'R'):-2, ('A', 'N'):-1, ('A', 'K'):-1,
-                               ('R', 'R'):7,  ('R', 'N'):-0.97, ('R', 'K'):3,
-                                              ('N', 'N'):7,  ('N', 'K'):0,
-                                                             ('K', 'K'):6}
+gap_start = 15
+gap = 7
+change = 7
+match = 7
 
 #для определённости первая строка будет меньшей из данных
 if len(sys.argv[1]) >= len(sys.argv[2]):
@@ -27,44 +25,71 @@ colomns = len(second_line)
 #инициализация матрицы нулями
 for i in range(rows):
     matrix.append([0] * colomns)
-    
+
+direction = {}
+direction[(0, 0)] = "diag"
+
+
+matrix[1][0] = matrix[0][0] - gap_start - gap
+matrix[0][1] = matrix[0][0] - gap_start - gap
+route[(1, 0)] = (0, 0)
+direction[(1, 0)] = "up"
+route[(0, 1)] = (0, 0)
+direction[(0, 1)] = "left"
+
 #заполняем первый ряд и первый столбец    
-for i in range(1, rows):
-  matrix[i][0] = matrix[i-1][0] - gap
+for i in range(2, rows):
+  matrix[i][0] = matrix[i-1][0] - gap - gap_start
   route[(i, 0)] = (i-1, 0)
-      
-for j in range(1, colomns):
-  matrix[0][j] = matrix[0][j-1] - gap
-  route[(0, j)] = (0, j-1) 
-    
+  direction[(i, 0)] = "up"
+  
+for j in range(2, colomns):
+  matrix[0][j] = matrix[0][j-1] - gap - gap-start
+  route[(0, j)] = (0, j-1)
+  direction[(0, j)] = "left"
+
+  
+  
 #выбираем максимальное значение     
 def environment(i, j):
-  if (first_line[i], second_line[j]) in weight_matrix:
-    diag = matrix[i-1][j-1] + weight_matrix[(first_line[i], second_line[j])]
+  
+  pdu = direction[(i-1, j)]
+  pdd = direction[(i-1, j-1)]
+  pdl = direction[(i, j-1)]
+  if pdu == "up":
+    up = matrix[i-1][j] - gap     
+  else: 
+    up = matrix[i-1][j] - gap_start - gap
+  if pdl == "left":
+    left = matrix[i][j-1] - gap 
   else:
-    diag = matrix[i-1][j-1] + weight_matrix[(second_line[j], first_line[i])]
-  up = matrix[i-1][j] - gap
-  left = matrix[i][j-1] - gap
+    left = matrix[i][j-1] - gap_start - gap 
+  if first_line[i] == second_line[j]:
+    diag = matrix[i-1][j-1] + match
+  else:
+    diag = matrix[i-1][j-1] - change    
   
   mx = max(diag, up, left)
-  
   if mx == diag:
-    return ((i-1, j-1), diag)
-  if mx == up:
-    return ((i-1, j), up)
-  if mx == left:
-    return ((i, j-1), left)
-  
-    
+    return ((i-1, j-1), diag, "diag")
+  elif mx == up:
+    return ((i-1, j), up, "up")
+  elif mx == left:
+    return ((i, j-1), left, "left")  
+   
 for el in range(1, rows):
   for i in range(el, rows):
-    matrix[i][el] = environment(i, el)[1]
-    route[(i, el)] = environment(i, el)[0]
+    env = environment(i, el)
+    matrix[i][el] = env[1]
+    route[(i, el)] = env[0]
+    direction[(i, el)] = env[2]
   for j in range(el+1, colomns):
-    matrix[el][j] = environment(el, j)[1]
-    route[(el, j)] = environment(el, j)[0]
+    env = environment(el, j)
+    matrix[el][j] = env[1]
+    route[(el, j)] = env[0]
+    direction[(el, j)] = env[2]
    
-   
+  
 al = [(rows-1, colomns-1)] 
 n = route[(rows-1, colomns-1)]
 al.append(n)

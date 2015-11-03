@@ -5,7 +5,7 @@ first_line = []
 second_line = []
 matrix = [] #матрица с весами
 route = {} #словарь типа: номер клетки-номер исходной клетки
-gap = 2
+gap = 0.3
 change = 2
 match = 1
 
