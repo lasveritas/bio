@@ -4,14 +4,14 @@ import sys
 first_line = []
 second_line = []
 
-A = [] #матрица с весами
+A = [] #матрица с вероятностями
 B = []
 C = []
 
-gap_start = -15
-gap = -7
-mismatch = -2
-match = 10
+gap_start = 2
+gap = -1
+mismatch = -1
+match = 1
 
 route = {} 
 
@@ -113,7 +113,7 @@ s_line = ''
 
 fcount = rows - 1
 scount = colomns - 1
-for i in range(0, len(rr)-1):
+for i in range(0, len(rr)):
   
   if rr[i] == 'B':
     f_line += first_line[fcount]
@@ -132,8 +132,11 @@ for i in range(0, len(rr)-1):
     scount -= 1
     
   
-
-print(f_line[::-1])
-print(s_line[::-1])
+if f_line[::-1][0] == '-' and s_line[::-1][0] =='-':
+  print(f_line[::-1][1:])
+  print(s_line[::-1][1:])
+else:
+  print(f_line[::-1])
+  print(s_line[::-1])
 
 print ('\n'+"alignment weight: "+ str(A[rows-1][colomns-1]))
