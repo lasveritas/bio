@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phyloxml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.phyloxml.org http://www.phyloxml.org/1.10/phyloxml.xsd" xmlns="http://www.phyloxml.org">
+<phylogeny rooted="false">
+<clade>
+<clade>
+<branch_length>1</branch_length>
+<clade>
+<branch_length>1.0</branch_length>
+<confidence type="unknown">1.0</confidence>
+<clade>
+<branch_length>1.0</branch_length>
+<confidence type="unknown">1.0</confidence>
+<clade>
+<name>A</name>
+<branch_length>1.0</branch_length>
+<confidence type="unknown">1.0</confidence>
+</clade>
+<clade>
+<name>B</name>
+<branch_length>4.0</branch_length>
+<confidence type="unknown">4.0</confidence>
+</clade>
+</clade>
+<clade>
+<name>C</name>
+<branch_length>2.0</branch_length>
+<confidence type="unknown">2.0</confidence>
+</clade>
+</clade>
+<clade>
+<branch_length>1.0</branch_length>
+<confidence type="unknown">1.0</confidence>
+<clade>
+<name>D</name>
+<branch_length>3.0</branch_length>
+<confidence type="unknown">3.0</confidence>
+</clade>
+<clade>
+<name>E</name>
+<branch_length>2.0</branch_length>
+<confidence type="unknown">2.0</confidence>
+</clade>
+</clade>
+</clade>
+<clade>
+<name>F</name>
+<branch_length>5.0</branch_length>
+<confidence type="unknown">5.0</confidence>
+</clade>
+</clade>
+</phylogeny>
+</phyloxml>
